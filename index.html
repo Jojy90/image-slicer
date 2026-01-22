@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ImageSplit Pro - Horizontal 4 Slices</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        .bg-animation {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .particle {
+            position: absolute;
+            background: rgba(255,255,255,0.12);
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            from { transform: translateY(100vh) rotate(0deg); }
+            to { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            color: white;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .main-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 30px;
+            padding: 40px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+        }
+
+        .upload-zone {
+            border: 3px dashed #667eea;
+            border-radius: 20px;
+            padding: 60px;
+            text-align: center;
+            cursor: pointer;
+            background: linear-gradient(135deg,#f5f7fa,#c3cfe2);
+            transition: 0.3s;
+        }
+
+        .upload-zone:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .preview-section,
+        .sliced-section {
+            display: none;
+            margin-top: 40px;
+        }
+
+        .preview-section.active,
+        .sliced-section.active {
+            display: block;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+        }
+
+        .original-preview {
+            text-align: center;
+        }
+
+        .original-preview img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .action-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 40px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            background: linear-gradient(135deg,#667eea,#764ba2);
+        }
+
+        .sliced-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+            gap: 25px;
+        }
+
+        .slice-card {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            text-align: center;
+        }
+
+        .slice-card img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg,#f093fb,#f5576c);
+            color: white;
+            cursor: pointer;
+        }
+
+        .download-all-btn {
+            margin-top: 30px;
+            background: linear-gradient(135deg,#43e97b,#38f9d7);
+        }
+
+        @media(max-width:768px){
+            .header h1 { font-size: 2rem; }
+            .main-card { padding: 25px; }
+        }
+
+        .twitter-link {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 999;
+    background: rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(10px);
+    padding: 10px 16px;
+    border-radius: 30px;
+    color: white;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    transition: all 0.3s ease;
+}
+
+.twitter-link:hover {
+    transform: translateY(-2px);
+    background: rgba(0, 0, 0, 0.4);
+}
+
+    </style>
+</head>
+
+<body>
+
+   <a href="https://x.com/AlfinWeb3" target="_blank" class="twitter-link">
+    Created by @AlfinWeb3
+</a>
+
+
+
+<div class="bg-animation" id="bgAnimation"></div>
+
+<div class="container">
+    <div class="header">
+        <h1>✂️ ImageSplit Pro</h1>
+        <p>Slice images into 4 horizontal parts</p>
+    </div>
+
+    <div class="main-card">
+        <div class="upload-zone" id="uploadZone">
+            <h2>📸 Drop image here</h2>
+            <p>or click to browse</p>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+
+        <div class="preview-section" id="previewSection">
+            <h2 class="section-title">Original Image</h2>
+            <div class="original-preview">
+                <img id="originalImage">
+            </div>
+            <button class="action-btn" id="sliceBtn">✨ Slice Horizontally</button>
+        </div>
+
+        <div class="sliced-section" id="slicedSection">
+            <h2 class="section-title">4 Horizontal Slices</h2>
+            <div class="sliced-grid" id="slicedGrid"></div>
+            <button class="action-btn download-all-btn" id="downloadAllBtn">
+                ⬇️ Download All
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const bg = document.getElementById("bgAnimation");
+    for(let i=0;i<15;i++){
+        const p=document.createElement("div");
+        p.className="particle";
+        const s=Math.random()*100+50;
+        p.style.width=s+"px";
+        p.style.height=s+"px";
+        p.style.left=Math.random()*100+"%";
+        p.style.animationDuration=(Math.random()*10+10)+"s";
+        bg.appendChild(p);
+    }
+
+    const uploadZone = document.getElementById("uploadZone");
+    const fileInput = document.getElementById("fileInput");
+    const previewSection = document.getElementById("previewSection");
+    const originalImage = document.getElementById("originalImage");
+    const sliceBtn = document.getElementById("sliceBtn");
+    const slicedSection = document.getElementById("slicedSection");
+    const slicedGrid = document.getElementById("slicedGrid");
+    const downloadAllBtn = document.getElementById("downloadAllBtn");
+
+    let currentImage = null;
+    let slicedData = [];
+
+    uploadZone.onclick = () => fileInput.click();
+
+    fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if(!file || !file.type.startsWith("image/")) return;
+
+        const reader = new FileReader();
+        reader.onload = ev => {
+            currentImage = new Image();
+            currentImage.onload = () => {
+                originalImage.src = ev.target.result;
+                previewSection.classList.add("active");
+                slicedSection.classList.remove("active");
+            };
+            currentImage.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    sliceBtn.onclick = () => {
+        const w = currentImage.width;
+        const h = currentImage.height;
+        const sliceH = h / 4;
+
+        slicedGrid.innerHTML = "";
+        slicedData = [];
+
+        for(let i=0;i<4;i++){
+            const canvas = document.createElement("canvas");
+            canvas.width = w;
+            canvas.height = sliceH;
+            const ctx = canvas.getContext("2d");
+
+            ctx.drawImage(
+                currentImage,
+                0, i * sliceH, w, sliceH,
+                0, 0, w, sliceH
+            );
+
+            const url = canvas.toDataURL("image/png");
+            slicedData.push(url);
+
+            const card = document.createElement("div");
+            card.className = "slice-card";
+            card.innerHTML = `
+                <img src="${url}">
+                <p>Slice ${i+1}</p>
+                <button class="download-btn" onclick="downloadSlice(${i})">
+                    Download
+                </button>
+            `;
+            slicedGrid.appendChild(card);
+        }
+
+        slicedSection.classList.add("active");
+        slicedSection.scrollIntoView({behavior:"smooth"});
+    };
+
+    function downloadSlice(i){
+        const a=document.createElement("a");
+        a.href=slicedData[i];
+        a.download=`slice_${i+1}.png`;
+        a.click();
+    }
+
+    downloadAllBtn.onclick = () => {
+        slicedData.forEach((_,i)=>{
+            setTimeout(()=>downloadSlice(i), i*300);
+        });
+    };
+</script>
+
+</body>
+</html>
